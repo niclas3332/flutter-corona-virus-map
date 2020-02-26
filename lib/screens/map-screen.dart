@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:admob_flutter/admob_flutter.dart';
 import 'package:coronamaps/keys.dart';
 import 'package:coronamaps/providers/has-premium.dart';
@@ -128,7 +130,7 @@ class _MapScreenState extends State<MapScreen> {
                         leading: Icon(Icons.error),
                         title: Text('An error occurred'),
                         subtitle: Text(
-                            'We couldn\'t fetch the corona virus data from Arcis.com\'s servers. Please check your internet connection or contact our customer support.'),
+                            'We couldn\'t fetch the corona virus data from our Firebase server. Please check your internet connection or contact our customer support.'),
                       ),
                       ButtonBar(
                         children: <Widget>[
@@ -156,78 +158,90 @@ class _MapScreenState extends State<MapScreen> {
         ),
       );
 
-    return Column(
-      children: <Widget>[
-        Container(
-          height: AppBar().preferredSize.height * 1.0,
-          color: Colors.green,
-          padding: EdgeInsets.symmetric(horizontal: 25, vertical: 10),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: <Widget>[
-              Row(
-                children: <Widget>[
-                  Text(
-                    "CONFIRMED: ",
-                    style: TextStyle(
-                        color: Colors.white, fontWeight: FontWeight.bold),
-                  ),
-                  Text(
-                    worldData.confirmed.toString(),
-                    style: TextStyle(color: Colors.white),
-                  ),
-                ],
-              ),
-              Row(
-                children: <Widget>[
-                  Text(
-                    "DEATHS: ",
-                    style: TextStyle(
-                        color: Colors.white, fontWeight: FontWeight.bold),
-                  ),
-                  Text(
-                    worldData.deaths.toString(),
-                    style: TextStyle(color: Colors.white),
-                  ),
-                ],
-              ),
-              Row(
-                children: <Widget>[
-                  Text(
-                    "RECOVERED: ",
-                    style: TextStyle(
-                        color: Colors.white, fontWeight: FontWeight.bold),
-                  ),
-                  Text(
-                    worldData.recovered.toString(),
-                    style: TextStyle(color: Colors.white),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-        Expanded(
-          child: Container(
-            child: GoogleMap(
-              initialCameraPosition: const CameraPosition(
-                target: LatLng(31.4153594, 97.3556841),
-                zoom: 3.0,
-              ),
-              circles: Set<Circle>.of(circles.values),
+    final screen = MediaQuery.of(context).size;
+
+    bool isX = (screen.height >= 896.0) && Platform.isIOS;
+
+    return Container(
+      color: Colors.green,
+      child: Column(
+        children: <Widget>[
+          Container(
+            height: AppBar().preferredSize.height * 1.1,
+            color: Colors.green,
+            padding: EdgeInsets.only(left: 25, right: 25, top: 15),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                Column(
+                  children: <Widget>[
+                    Text(
+                      "CONFIRMED",
+                      style: TextStyle(
+                          color: Colors.white, fontWeight: FontWeight.bold),
+                    ),
+                    Text(
+                      worldData.confirmed.toString(),
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ],
+                ),
+                Column(
+                  children: <Widget>[
+                    Text(
+                      "DEATHS",
+                      style: TextStyle(
+                          color: Colors.white, fontWeight: FontWeight.bold),
+                    ),
+                    Text(
+                      worldData.deaths.toString(),
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ],
+                ),
+                Column(
+                  children: <Widget>[
+                    Text(
+                      "RECOVERED",
+                      style: TextStyle(
+                          color: Colors.white, fontWeight: FontWeight.bold),
+                    ),
+                    Text(
+                      worldData.recovered.toString(),
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ],
+                ),
+              ],
             ),
           ),
-        ),
-        Consumer<HasPremium>(builder: (BuildContext ctx, consumer, _) {
-          if (!consumer.hasPremium)
-            return AdmobBanner(
-              adUnitId: Keys.adUnitId,
-              adSize: AdmobBannerSize.FULL_BANNER,
-            );
-          else
-            return Container();
-        }),
-      ],
+          Expanded(
+            child: Container(
+              child: GoogleMap(
+                initialCameraPosition: const CameraPosition(
+                  target: LatLng(31.4153594, 97.3556841),
+                  zoom: 3.0,
+                ),
+                circles: Set<Circle>.of(circles.values),
+              ),
+            ),
+          ),
+          Consumer<HasPremium>(builder: (BuildContext ctx, consumer, _) {
+            if (!consumer.hasPremium)
+              return Column(
+                children: <Widget>[
+                  AdmobBanner(
+                    adUnitId: Platform.isIOS ? Keys.adUnitIdiOS : Keys.adUnitId,
+                    adSize: AdmobBannerSize.FULL_BANNER,
+                  ),
+                  isX ? SizedBox(height: 25) : Container()
+                ],
+              );
+            else
+              return Container();
+          }),
+        ],
+      ),
     );
   }
 }

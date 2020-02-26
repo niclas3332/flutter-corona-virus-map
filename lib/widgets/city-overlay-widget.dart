@@ -1,12 +1,22 @@
- import 'package:firebase_analytics/firebase_analytics.dart';
+import 'dart:io';
+
+import 'package:coronamaps/providers/has-premium.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:timeago/timeago.dart' as timeago;
+
 class CityOverlayWidget {
-
-
-OverlayEntry overlayEntry;
-  void insertOverlayCity(BuildContext context, int recovereds, int conf,
-      int death, String province, int lastUpdate, int key, FirebaseAnalytics analytics) {
+  OverlayEntry overlayEntry;
+  void insertOverlayCity(
+      BuildContext context,
+      int recovereds,
+      int conf,
+      int death,
+      String province,
+      int lastUpdate,
+      int key,
+      FirebaseAnalytics analytics) {
     analytics
         .logEvent(name: "clickCountry", parameters: {"province": province});
 
@@ -16,9 +26,16 @@ OverlayEntry overlayEntry;
 
     overlayEntry = OverlayEntry(builder: (context) {
       final screen = MediaQuery.of(context).size;
+      print(screen.height);
+      bool isX = (screen.height >= 896.0) && Platform.isIOS;
+      bool isPremium =
+          Provider.of<HasPremium>(context, listen: false).hasPremium;
 
       return Padding(
-        padding: EdgeInsets.only(top: screen.height - 150, left: 50, right: 50),
+        padding: EdgeInsets.only(
+            top: screen.height - 150 - (isPremium ? (isX ?  25 : 0) : (isX ? 75 : 50)),
+            left: 20,
+            right: 20),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -88,10 +105,9 @@ OverlayEntry overlayEntry;
                       ),
                     ),
                     Divider(),
-                    Text(
-                      "updated " +
-                          timeago.format(DateTime.fromMillisecondsSinceEpoch(lastUpdate))
-                    ),
+                    Text("updated " +
+                        timeago.format(
+                            DateTime.fromMillisecondsSinceEpoch(lastUpdate))),
                     SizedBox(
                       height: 10,
                     ),
@@ -106,5 +122,4 @@ OverlayEntry overlayEntry;
 
     return Overlay.of(context).insert(overlayEntry);
   }
-
 }

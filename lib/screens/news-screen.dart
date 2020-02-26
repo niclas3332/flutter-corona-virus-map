@@ -1,9 +1,13 @@
-import 'package:admob_flutter/admob_flutter.dart';
+import 'dart:io';
+import 'package:coronamaps/keys.dart';
+import 'package:coronamaps/providers/has-premium.dart';
 import 'package:coronamaps/providers/news-provider.dart';
+import 'package:timeago/timeago.dart' as timeago;
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:flutter_native_admob/flutter_native_admob.dart';
 
 class NewsScreen extends StatefulWidget {
   @override
@@ -44,6 +48,7 @@ class _NewsScreenState extends State<NewsScreen> {
   @override
   Widget build(BuildContext context) {
     var news = Provider.of<NewsProvider>(context).news;
+    bool hasPremium = Provider.of<HasPremium>(context).hasPremium;
 
     if (isLoading) {
       return Center(child: CircularProgressIndicator());
@@ -67,7 +72,7 @@ class _NewsScreenState extends State<NewsScreen> {
                         leading: Icon(Icons.error),
                         title: Text('An error occurred'),
                         subtitle: Text(
-                            'We couldn\'t fetch the news data from Google\'s servers. Please check your internet connection or contact our customer support.'),
+                            'We couldn\'t fetch the news data from Microsoft Azure\'s servers. Please check your internet connection or contact our customer support.'),
                       ),
                       ButtonBar(
                         children: <Widget>[
@@ -94,33 +99,66 @@ class _NewsScreenState extends State<NewsScreen> {
           ],
         ),
       );
-
+    print(news.length);
     return RefreshIndicator(
       onRefresh: () {
         return _reloadNews();
       },
       child: ListView.builder(
-        itemCount: news.length + 2,
+        itemCount: news.length,
         itemBuilder: (context, i) {
-          if (i == 0)
-            return Container(height: 180,
+          print(i);
+          if (i == 0 && !hasPremium)
+            return Container(
+              height: 180,
+              width: double.infinity,
               child: Card(
-                    shape: RoundedRectangleBorder(
+                shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.all(Radius.circular(5)),
                 ),
                 elevation: 5,
-                  margin: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                child: AdmobBanner(
-                  adUnitId: "ca-app-pub-1584545233898847/6957889236",
-                  adSize: AdmobBannerSize.SMART_BANNER,
+                margin: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                child: NativeAdmobBannerView(
+                  adUnitID: Platform.isIOS
+                      ? Keys.smartAdUnitIdiOS
+                      : Keys.smartAdUnitId,
+                  style: BannerStyle.light, // enum dark or light
+                  showMedia: true, // whether to show media view or not
+                  contentPadding: EdgeInsets.all(10), // content padding
+                  onCreate: (controller) {
+                    controller
+                        .setStyle(BannerStyle.light); // Dynamic update style
+                  },
                 ),
               ),
             );
 
-            if(i % 10 == 0)
-            return Text("Loaded from News API with ❤️", style: TextStyle(height: 2) ,textAlign: TextAlign.center, );
+          if (i % 15 == 0 && !hasPremium)
+            return Container(
+              height: 180,
+              width: double.infinity,
+              child: Card(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(5)),
+                ),
+                elevation: 5,
+                margin: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                child: NativeAdmobBannerView(
+                  adUnitID: Platform.isIOS
+                      ? Keys.smartAdUnitIdiOS
+                      : Keys.smartAdUnitId,
+                  style: BannerStyle.light, // enum dark or light
+                  showMedia: true, // whether to show media view or not
+                  contentPadding: EdgeInsets.all(10), // content padding
+                  onCreate: (controller) {
+                    controller
+                        .setStyle(BannerStyle.light); // Dynamic update style
+                  },
+                ),
+              ),
+            );
 
-          if (i == 1)
+          if (i == 1 && !hasPremium)
             return Card(
                 margin: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                 shape: RoundedRectangleBorder(
@@ -139,7 +177,10 @@ class _NewsScreenState extends State<NewsScreen> {
                       title: Text(
                           "AD: Wuhan Coronavirus: A Concise & Rational Guide to the 2020 Outbreak"),
                       subtitle: Text(
-                          "The newest coronavirus, officially known as COVID-19 (previously 2019-nCoV ARD), has spread to more than 35 nations and sickened 79,700+ people. This concise, 237-page guide to the illness offers a rational, non-alarmist approach from an Amazon #1 best-selling author."),
+                        "The newest coronavirus, officially known as COVID-19 (previously 2019-nCoV ARD), has spread to more than 35 nations and sickened 79,700+ people. This concise, 237-page guide to the illness offers a rational, non-alarmist approach from an Amazon #1 best-selling author.",
+                        maxLines: 3,
+                        overflow: TextOverflow.ellipsis,
+                      ),
                       contentPadding:
                           EdgeInsets.symmetric(horizontal: 15, vertical: 10),
                       onTap: () {
@@ -148,12 +189,9 @@ class _NewsScreenState extends State<NewsScreen> {
                     ),
                   ],
                 ));
-          i -= 2;
 
-
-
-          if(i == 5)
-              return Card(
+          if (i == 5 && !hasPremium)
+            return Card(
                 margin: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.all(Radius.circular(5)),
@@ -170,15 +208,15 @@ class _NewsScreenState extends State<NewsScreen> {
                           )),
                       title: Text(
                           "AD: 100 PCS Medical Masks Disposable Face Masks with Elastic Ear Loop"),
-                          subtitle: Text(""),
-                    contentPadding:
+                      subtitle: Text(""),
+                      contentPadding:
                           EdgeInsets.symmetric(horizontal: 15, vertical: 10),
                       onTap: () {
                         launch("https://amzn.to/2TanGDn");
                       },
                     ),
                   ],
-                )); 
+                ));
 
           return Card(
               margin: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
@@ -189,14 +227,25 @@ class _NewsScreenState extends State<NewsScreen> {
               child: Column(
                 children: <Widget>[
                   ListTile(
-                    leading: SizedBox(
-                        height: 64,
-                        width: 64,
-                        child: Image.network(
-                          news[i]["urlToImage"],
-                        )),
-                    title: Text(news[i]["title"]),
-                    subtitle: Text(news[i]["description"]),
+                    leading: news[i]["image"] != null
+                        ? SizedBox(
+                            height: 64,
+                            width: 64,
+                            child: Image.network(
+                              news[i]["image"] != null
+                                  ? news[i]["image"]["thumbnail"]["contentUrl"]
+                                  : "",
+                            ))
+                        : null,
+                    title: Text(news[i]["name"],
+                        maxLines: 2, overflow: TextOverflow.ellipsis),
+                    subtitle: Text(
+                      timeago.format(DateTime.parse(news[i]["datePublished"])) +
+                          " - " +
+                          news[i]["description"],
+                      maxLines: 4,
+                      overflow: TextOverflow.ellipsis,
+                    ),
                     contentPadding:
                         EdgeInsets.symmetric(horizontal: 15, vertical: 10),
                     onTap: () {

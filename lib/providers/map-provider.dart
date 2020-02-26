@@ -42,7 +42,7 @@ class MapProvider extends ChangeNotifier {
       newCircles.add(Circle(
           strokeColor: Colors.red,
           fillColor: Colors.red.withOpacity(0.5),
-          strokeWidth: 5,
+          strokeWidth: 1,
           circleId: circleId,
           center: element.position,
           radius: max(min(element.confirmed.toDouble() * 100, 200000), 5000)));

@@ -9,17 +9,19 @@ class HasPremium extends ChangeNotifier {
   checkPremium() async {
     var result = await FlutterInappPurchase.instance.initConnection;
     print('result: $result');
-
+try {
     List<PurchasedItem> purchaseHistory =
         await FlutterInappPurchase.instance.getPurchaseHistory();
 
-    if (purchaseHistory.length > 0) _hasPremium = true;
+    if (purchaseHistory.length > 0) _hasPremium = false;
 
     notifyListeners();
+
+} catch (err){}
   }
 
   setPremium(bool setter) {
-    _hasPremium = setter;
+    _hasPremium = false;
     notifyListeners();
   }
 }

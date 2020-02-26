@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:coronamaps/providers/has-premium.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_inapp_purchase/flutter_inapp_purchase.dart';
@@ -49,13 +50,13 @@ class _RemoveAdsScreenState extends State<RemoveAdsScreen> {
 
   Future<Null> _getProduct() async {
     List<IAPItem> items2 = await FlutterInappPurchase.instance
-        .getProducts(["remove_ads", "remove_ads_5"]);
+        .getProducts(["remove_ads", "remove_ads_5", "remove_ads_1"]);
 
     List<IAPItem> items = await FlutterInappPurchase.instance
-        .getSubscriptions(["remove_ads_abo"]);
+        .getSubscriptions(["remove_ads_abo", "remove_ads_abo_2"]);
 
     if (purchaseHistory.where((test) {
-          if (test.productId == "remove_ads_abo") return true;
+          if (test.productId == "remove_ads_abo" ||test.productId == "remove_ads_abo_2"  ) return true;
           return false;
         }).length ==
         0)
@@ -72,14 +73,47 @@ class _RemoveAdsScreenState extends State<RemoveAdsScreen> {
     setState(() {});
   }
 
+
+Future<void> _neverSatisfied() async {
+  return showDialog<void>(
+    context: context,
+    barrierDismissible: false, // user must tap button!
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: Text('Thank you for your purchase!'),
+        content: SingleChildScrollView(
+          child: ListBody(
+            children: <Widget>[
+              Text('Now all ads are gone.'),
+              Text('Thank\'s for your support.'),
+            ],
+          ),
+        ),
+        actions: <Widget>[
+          FlatButton(
+            child: Text('Close'),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+          ),
+        ],
+      );
+    },
+  );
+}
+
+
   Future<Null> _buyProduct(IAPItem item) async {
     try {
       PurchasedItem purchased =
           await FlutterInappPurchase.instance.requestPurchase(item.productId);
       print(purchased);
       String msg = await FlutterInappPurchase.instance.consumeAllItems;
+
+      
       Provider.of<HasPremium>(context, listen: false).checkPremium();
       print('consumeAllItems: $msg');
+      _neverSatisfied();
     } catch (error) {
       print('$error');
     }
@@ -108,7 +142,7 @@ class _RemoveAdsScreenState extends State<RemoveAdsScreen> {
                       shape: new RoundedRectangleBorder(
                           borderRadius: new BorderRadius.circular(30.0)),
                       child: Text(
-                        'Spend ${item.price} ${item.currency} ${item.subscriptionPeriodAndroid}',
+                        'Spend ${item.price} ${item.currency} ${Platform.isIOS ? ( item.subscriptionPeriodNumberIOS != null ?  item.subscriptionPeriodNumberIOS + " " + item.subscriptionPeriodUnitIOS : "" ) : item.subscriptionPeriodAndroid != null ? item.subscriptionPeriodAndroid : ""}',
                         style: Theme.of(context).primaryTextTheme.button,
                       ),
                     ),

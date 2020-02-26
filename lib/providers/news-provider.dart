@@ -11,11 +11,14 @@ class NewsProvider extends ChangeNotifier {
 
   Future<void> loadNews() async {
     print("Reload News");
-    var newsJSON = json.decode((await http.get(newsUrl)).body);
+    // var newsJSON = json.decode((await http.get(newsUrl)).body);
 
-    print(newsJSON);
+    var azure = await http.get(newsUrl
+        ,
+        headers: {"Ocp-Apim-Subscription-Key": Keys.azureApiKey});
 
-    news = newsJSON["articles"];
+
+    news = json.decode(azure.body)["value"];
 
     notifyListeners();
   }
