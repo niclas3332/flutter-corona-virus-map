@@ -7,22 +7,18 @@ class InfoScreen extends StatefulWidget {
 }
 
 class _InfoScreenState extends State<InfoScreen> {
-   FirebaseAnalytics analytics = FirebaseAnalytics();
+  FirebaseAnalytics analytics = FirebaseAnalytics();
 
-
-
-@override
+  @override
   void initState() {
-    
-
-    analytics.setCurrentScreen(screenName: "/screens/infoScreen");
     super.initState();
+    analytics.setCurrentScreen(screenName: "/screens/infoScreen");
   }
-
 
   @override
   Widget build(BuildContext context) {
-    return Container(padding: EdgeInsets.symmetric(vertical: 15),
+    return Container(
+      padding: EdgeInsets.symmetric(vertical: 15),
       child: Center(
           child: Text(
         "This feature will be added in a coming update.",

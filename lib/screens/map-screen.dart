@@ -52,6 +52,8 @@ class _MapScreenState extends State<MapScreen> {
         _isLoading = false;
       });
     }).catchError((_) {
+      analytics.logEvent(name: "catchError_mapProvider");
+
       setState(() {
         _isLoading = false;
         _isError = true;
@@ -66,6 +68,8 @@ class _MapScreenState extends State<MapScreen> {
     Provider.of<WorldProvider>(context, listen: false)
         .fetchData()
         .catchError((_) {
+      analytics.logEvent(name: "catchError_worldProvider");
+
       print("Error");
     }).then((_) {
       setState(() {});
@@ -77,12 +81,12 @@ class _MapScreenState extends State<MapScreen> {
     _fetchMap();
 
     Provider.of<HasPremium>(context, listen: false).checkPremium();
+
+    super.initState();
     initUniqueIdentifierState();
 
     analytics.setCurrentScreen(
         screenName: "/screens/mapScreen"); // why logging this
-
-    super.initState();
   }
 
   int key = 0;
@@ -160,6 +164,8 @@ class _MapScreenState extends State<MapScreen> {
                           FlatButton(
                             child: const Text('CONTACT US'),
                             onPressed: () {
+                              analytics.logEvent(name: "pressed_contactUs");
+
                               launch(
                                   ("mailto:apps@niclas.xyz?subject=Corona%20Map%20App:%20Fetch%20Map%20no%20connection"));
                             },

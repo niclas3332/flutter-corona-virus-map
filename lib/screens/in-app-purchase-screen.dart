@@ -6,14 +6,13 @@ import 'package:flutter_inapp_purchase/flutter_inapp_purchase.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 
-
 class RemoveAdsScreen extends StatefulWidget {
   @override
   _RemoveAdsScreenState createState() => _RemoveAdsScreenState();
 }
 
 class _RemoveAdsScreenState extends State<RemoveAdsScreen> {
-   FirebaseAnalytics analytics = FirebaseAnalytics();
+  FirebaseAnalytics analytics = FirebaseAnalytics();
 
   static const String iapId = 'android.test.purchased';
   List<IAPItem> _items = [];
@@ -23,7 +22,6 @@ class _RemoveAdsScreenState extends State<RemoveAdsScreen> {
     super.initState();
     initPlatformState();
     analytics.setCurrentScreen(screenName: "/screens/inAppPurchaseScreen");
-   
   }
 
   Future<void> initPlatformState() async {
@@ -62,7 +60,8 @@ class _RemoveAdsScreenState extends State<RemoveAdsScreen> {
         .getSubscriptions(["remove_ads_abo", "remove_ads_abo_2"]);
 
     if (purchaseHistory.where((test) {
-          if (test.productId == "remove_ads_abo" ||test.productId == "remove_ads_abo_2"  ) return true;
+          if (test.productId == "remove_ads_abo" ||
+              test.productId == "remove_ads_abo_2") return true;
           return false;
         }).length ==
         0)
@@ -79,44 +78,45 @@ class _RemoveAdsScreenState extends State<RemoveAdsScreen> {
     setState(() {});
   }
 
-
-Future<void> _neverSatisfied() async {
-  return showDialog<void>(
-    context: context,
-    barrierDismissible: false, // user must tap button!
-    builder: (BuildContext context) {
-      return AlertDialog(
-        title: Text('Thank you for your purchase!'),
-        content: SingleChildScrollView(
-          child: ListBody(
-            children: <Widget>[
-              Text('Now all ads are gone.'),
-              Text('Thank\'s for your support.'),
-            ],
+  Future<void> _neverSatisfied() async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Thank you for your purchase!'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text('Now all ads are gone.'),
+                Text('Thank\'s for your support.'),
+              ],
+            ),
           ),
-        ),
-        actions: <Widget>[
-          FlatButton(
-            child: Text('Close'),
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-          ),
-        ],
-      );
-    },
-  );
-}
-
+          actions: <Widget>[
+            FlatButton(
+              child: Text('Close'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   Future<Null> _buyProduct(IAPItem item) async {
     try {
+      analytics.logEvent(name: "buyProduct_" + item.productId, parameters: {
+        "product_id": item.productId,
+        "price": item.price,
+      });
       PurchasedItem purchased =
           await FlutterInappPurchase.instance.requestPurchase(item.productId);
       print(purchased);
       String msg = await FlutterInappPurchase.instance.consumeAllItems;
 
-      
       Provider.of<HasPremium>(context, listen: false).checkPremium();
       print('consumeAllItems: $msg');
       _neverSatisfied();
@@ -148,7 +148,7 @@ Future<void> _neverSatisfied() async {
                       shape: new RoundedRectangleBorder(
                           borderRadius: new BorderRadius.circular(30.0)),
                       child: Text(
-                        'Spend ${item.price} ${item.currency} ${Platform.isIOS ? ( item.subscriptionPeriodNumberIOS != null ?  item.subscriptionPeriodNumberIOS + " " + item.subscriptionPeriodUnitIOS : "" ) : item.subscriptionPeriodAndroid != null ? item.subscriptionPeriodAndroid : ""}',
+                        'Spend ${item.price} ${item.currency} ${Platform.isIOS ? (item.subscriptionPeriodNumberIOS != null ? item.subscriptionPeriodNumberIOS + " " + item.subscriptionPeriodUnitIOS : "") : item.subscriptionPeriodAndroid != null ? item.subscriptionPeriodAndroid : ""}',
                         style: Theme.of(context).primaryTextTheme.button,
                       ),
                     ),

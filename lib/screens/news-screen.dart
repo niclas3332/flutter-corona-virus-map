@@ -16,7 +16,7 @@ class NewsScreen extends StatefulWidget {
 }
 
 class _NewsScreenState extends State<NewsScreen> {
-   FirebaseAnalytics analytics = FirebaseAnalytics();
+  FirebaseAnalytics analytics = FirebaseAnalytics();
 
   bool isLoading = true;
   bool isError = false;
@@ -35,6 +35,7 @@ class _NewsScreenState extends State<NewsScreen> {
         isLoading = false;
       });
     }).catchError((_) {
+      analytics.logEvent(name: "catchError_newsProvider");
       setState(() {
         isError = true;
       });
@@ -45,9 +46,8 @@ class _NewsScreenState extends State<NewsScreen> {
   void initState() {
     _reloadNews();
 
-    analytics.setCurrentScreen(screenName: "/screens/newsScreen");
-
     super.initState();
+    analytics.setCurrentScreen(screenName: "/screens/newsScreen");
   }
 
   @override
@@ -59,7 +59,7 @@ class _NewsScreenState extends State<NewsScreen> {
       return Center(child: CircularProgressIndicator());
     }
 
-    if (isError)
+    if (isError) {
       return RefreshIndicator(
         onRefresh: () => _reloadNews(),
         child: ListView(
@@ -105,7 +105,8 @@ class _NewsScreenState extends State<NewsScreen> {
           ],
         ),
       );
-    print(news.length);
+    }
+
     return RefreshIndicator(
       onRefresh: () {
         return _reloadNews();
