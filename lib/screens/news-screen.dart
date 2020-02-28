@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:coronamaps/keys.dart';
 import 'package:coronamaps/providers/has-premium.dart';
 import 'package:coronamaps/providers/news-provider.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
 import 'package:flutter/material.dart';
@@ -15,6 +16,8 @@ class NewsScreen extends StatefulWidget {
 }
 
 class _NewsScreenState extends State<NewsScreen> {
+   FirebaseAnalytics analytics = FirebaseAnalytics();
+
   bool isLoading = true;
   bool isError = false;
   _reloadNews() {
@@ -41,6 +44,8 @@ class _NewsScreenState extends State<NewsScreen> {
   @override
   void initState() {
     _reloadNews();
+
+    analytics.setCurrentScreen(screenName: "/screens/newsScreen");
 
     super.initState();
   }
@@ -85,6 +90,7 @@ class _NewsScreenState extends State<NewsScreen> {
                           FlatButton(
                             child: const Text('CONTACT US'),
                             onPressed: () {
+                              analytics.logEvent(name: "pressed_contactUs");
                               launch(
                                   ("mailto:apps@niclas.xyz?subject=Corona%20Map%20App:%20Fetch%20News%20no%20connection"));
                             },

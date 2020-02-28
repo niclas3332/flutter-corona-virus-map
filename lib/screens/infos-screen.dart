@@ -1,3 +1,4 @@
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 
 class InfoScreen extends StatefulWidget {
@@ -6,9 +7,22 @@ class InfoScreen extends StatefulWidget {
 }
 
 class _InfoScreenState extends State<InfoScreen> {
+   FirebaseAnalytics analytics = FirebaseAnalytics();
+
+
+
+@override
+  void initState() {
+    
+
+    analytics.setCurrentScreen(screenName: "/screens/infoScreen");
+    super.initState();
+  }
+
+
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return Container(padding: EdgeInsets.symmetric(vertical: 15),
       child: Center(
           child: Text(
         "This feature will be added in a coming update.",

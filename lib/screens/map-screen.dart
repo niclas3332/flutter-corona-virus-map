@@ -10,6 +10,8 @@ import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
+import 'package:unique_identifier/unique_identifier.dart';
+
 import 'package:url_launcher/url_launcher.dart';
 
 class MapScreen extends StatefulWidget {
@@ -19,6 +21,17 @@ class MapScreen extends StatefulWidget {
 
 class _MapScreenState extends State<MapScreen> {
   FirebaseAnalytics analytics = FirebaseAnalytics();
+
+  Future<void> initUniqueIdentifierState() async {
+    String identifier;
+    try {
+      identifier = await UniqueIdentifier.serial;
+
+      analytics.setUserId(identifier);
+    } catch (err) {
+      identifier = 'Failed to get Unique Identifier';
+    }
+  }
 
   bool _isError = false;
   bool _isLoading = true;
@@ -64,6 +77,10 @@ class _MapScreenState extends State<MapScreen> {
     _fetchMap();
 
     Provider.of<HasPremium>(context, listen: false).checkPremium();
+    initUniqueIdentifierState();
+
+    analytics.setCurrentScreen(
+        screenName: "/screens/mapScreen"); // why logging this
 
     super.initState();
   }

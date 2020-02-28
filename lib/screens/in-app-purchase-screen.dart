@@ -4,6 +4,8 @@ import 'package:coronamaps/providers/has-premium.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_inapp_purchase/flutter_inapp_purchase.dart';
 import 'package:provider/provider.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
+
 
 class RemoveAdsScreen extends StatefulWidget {
   @override
@@ -11,6 +13,8 @@ class RemoveAdsScreen extends StatefulWidget {
 }
 
 class _RemoveAdsScreenState extends State<RemoveAdsScreen> {
+   FirebaseAnalytics analytics = FirebaseAnalytics();
+
   static const String iapId = 'android.test.purchased';
   List<IAPItem> _items = [];
   List<PurchasedItem> purchaseHistory = [];
@@ -18,6 +22,8 @@ class _RemoveAdsScreenState extends State<RemoveAdsScreen> {
   void initState() {
     super.initState();
     initPlatformState();
+    analytics.setCurrentScreen(screenName: "/screens/inAppPurchaseScreen");
+   
   }
 
   Future<void> initPlatformState() async {

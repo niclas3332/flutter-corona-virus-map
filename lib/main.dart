@@ -10,17 +10,16 @@ import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_analytics/observer.dart';
-
 import 'keys.dart';
 import 'providers/has-premium.dart';
+
+FirebaseAnalytics analytics = FirebaseAnalytics();
 
 void main() {
   Admob.initialize(Keys.admobAppId);
 
   runApp(MyApp());
 }
-
-FirebaseAnalytics analytics = FirebaseAnalytics();
 
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.

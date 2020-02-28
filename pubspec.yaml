@@ -33,6 +33,7 @@ dependencies:
   admob_flutter: ^0.3.4
   flutter_inapp_purchase: ^2.1.2
   flutter_native_admob: ^1.0.0
+  unique_identifier: ^0.0.3
 
 
 
