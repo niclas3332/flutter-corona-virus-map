@@ -8,6 +8,6 @@ Hey, this is my first project in flutter and my first public repo.
 
 It would be nice, if you give some feedback.
 
-Download in Google Play Store: http://bit.ly/coronavirus-gplay
+Download in Google Play Store: *removed*
 
 Download in Apple App Store: *Coming Soon*
