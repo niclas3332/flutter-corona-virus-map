@@ -15,7 +15,7 @@ class NewsProvider extends ChangeNotifier {
     // var newsJSON = json.decode((await http.get(newsUrl)).body);
 
     var azure = await http
-        .get(Uri.parse("https://www.reddit.com/r/corona/.json" ));
+        .get(Uri.parse("https://www.reddit.com/r/Coronavirus/.json" ));
 
     news = json.decode(azure.body)["data"]["children"];
 
