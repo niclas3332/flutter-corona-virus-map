@@ -121,7 +121,7 @@ class _NewsScreenState extends State<NewsScreen> {
                     title: Text(news[i]["data"]["title"],
                         maxLines: 2, overflow: TextOverflow.ellipsis),
                     subtitle: Text(
-                      "${timeago.format(DateTime.fromMicrosecondsSinceEpoch(
+                      "${timeago.format(DateTime.fromMillisecondsSinceEpoch(
                               news[i]["data"]["created_utc"] * 10000))} - ${news[i]["data"]["selftext"]}",
                       maxLines: 4,
                       overflow: TextOverflow.ellipsis,
