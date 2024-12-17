@@ -9,6 +9,8 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 
 class MapScreen extends StatefulWidget {
+  const MapScreen({Key? key}) : super(key: key);
+
   @override
   _MapScreenState createState() => _MapScreenState();
 }
@@ -79,18 +81,18 @@ class _MapScreenState extends State<MapScreen> {
 
   @override
   Widget build(BuildContext context) {
-    var _circles = Provider.of<MapProvider>(
+    var circles0 = Provider.of<MapProvider>(
       context,
     ).circles;
 
-    var _circleData = Provider.of<MapProvider>(
+    var circleData = Provider.of<MapProvider>(
       context,
     ).circleData;
 
-    var circles = Map<CircleId, Circle>();
+    var circles = <CircleId, Circle>{};
     var widget = CityOverlayWidget();
 
-    _circles.values.forEach((f) {
+    for (var f in circles0.values) {
       circles[f.circleId] = Circle(
           circleId: f.circleId,
           center: f.center,
@@ -102,17 +104,17 @@ class _MapScreenState extends State<MapScreen> {
           visible: f.visible,
           zIndex: f.zIndex,
           onTap: () {
-            print("Optapped " + _circleData[f.circleId]!.country);
+            print("Optapped " + circleData[f.circleId]!.country);
             widget.insertOverlayCity(
                 context,
-                _circleData[f.circleId]!.recovered,
-                _circleData[f.circleId]!.confirmed,
-                _circleData[f.circleId]!.deaths,
-                _circleData[f.circleId]!.country,
-                _circleData[f.circleId]!.lastUpdate,
+                circleData[f.circleId]!.recovered,
+                circleData[f.circleId]!.confirmed,
+                circleData[f.circleId]!.deaths,
+                circleData[f.circleId]!.country,
+                circleData[f.circleId]!.lastUpdate,
                 key);
           });
-    });
+    }
 
     var worldData = Provider.of<WorldProvider>(context);
 
@@ -158,7 +160,6 @@ class _MapScreenState extends State<MapScreen> {
         ),
       );}
 
-    final screen = MediaQuery.of(context).size;
 final formatter = NumberFormat();
 
 
@@ -204,14 +205,12 @@ final formatter = NumberFormat();
             ),
           ),
           Expanded(
-            child: Container(
-              child: GoogleMap(
-                initialCameraPosition: const CameraPosition(
-                  target: LatLng(31.4153594, 97.3556841),
-                  zoom: 3.0,
-                ),
-                circles: Set<Circle>.of(circles.values),
+            child: GoogleMap(
+              initialCameraPosition: const CameraPosition(
+                target: LatLng(31.4153594, 97.3556841),
+                zoom: 3.0,
               ),
+              circles: Set<Circle>.of(circles.values),
             ),
           ),
       

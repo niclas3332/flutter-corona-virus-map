@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:coronamaps/providers/news-provider.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
@@ -122,22 +121,19 @@ class _NewsScreenState extends State<NewsScreen> {
                     title: Text(news[i]["data"]["title"],
                         maxLines: 2, overflow: TextOverflow.ellipsis),
                     subtitle: Text(
-                      timeago.format(DateTime.fromMicrosecondsSinceEpoch(
-                              news[i]["data"]["created_utc"] * 10000)) +
-                          " - " +
-                          news[i]["data"]["selftext"],
+                      "${timeago.format(DateTime.fromMicrosecondsSinceEpoch(
+                              news[i]["data"]["created_utc"] * 10000))} - ${news[i]["data"]["selftext"]}",
                       maxLines: 4,
                       overflow: TextOverflow.ellipsis,
                     ),
                     contentPadding:
                         EdgeInsets.symmetric(horizontal: 15, vertical: 10),
                     onTap: () {
-                      launchUrl(news[i]["data"]["url"]);
+                      launchUrl(Uri.parse(news[i]["data"]["url"]));
                     },
                   ),
                 ],
               ));
-          return null;
         },
       ),
     );
