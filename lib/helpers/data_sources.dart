@@ -4,49 +4,38 @@ import 'package:coronamaps/models/marker.dart' as mrk;
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
 
-import '../keys.dart';
+
 
 class DataSources {
-  static final String all = Keys.dataSourcesAll;
-  static final String recovered = Keys.dataSourcesRecovered;
 
   static Future<List<mrk.Marker>> getAll() async {
-    var response = await http.get(all);
+    var response = await http.get(Uri.parse("https://covid-api.com/api/reports"));
 
     List<mrk.Marker> newList = [];
 
     var data = json.decode(response.body);
     print("Fetched data");
-    data["features"].forEach((val) {
-      val = val["attributes"];
+    data["data"].forEach((val) {
+      
       newList.add(mrk.Marker(
-          confirmed: val["Confirmed"],
-          country: val["Province_State"] != null
-              ? val["Province_State"] + ", " + val["Country_Region"]
-              : val["Country_Region"],
-          deaths: val["Deaths"],
-          id: val["OBJECTID"].toString(),
-          lastUpdate: val["Last_Update"],
-          recovered: val["Recovered"],
-          position: LatLng(double.parse(val["Lat"].toString()),
-              double.parse(val["Long_"].toString()))));
+          confirmed: int.tryParse(val["confirmed"].toString()) ?? -1,
+          country: val["region"]["name"],
+          deaths: int.tryParse(val["deaths"].toString()) ?? -1,
+          id: val["region"]["iso"],
+          lastUpdate: DateTime.parse(val["last_update"]).millisecondsSinceEpoch ,
+          recovered: int.tryParse(val["recovered"].toString()) ?? -1,
+          position: LatLng(double.tryParse(val["region"]["lat"].toString()) ?? 0   ,
+              double.tryParse(val["region"]["long"].toString()) ?? 0  )));
     });
 
     return newList;
   }
 
   static Future<Map> getRecovered() async {
-    var response = await http.get(recovered);
-    var resp = {};
-    var data = json.decode(response.body);
-    print("Fetched recovered");
-    data["features"].forEach((val) {
-      val = val["attributes"];
-
-      resp = {...val};
-    });
-    print(resp);
-    return resp;
+    var response = await http.get(Uri.parse("https://covid-api.com/api/reports/total"));
+    var data = json.decode(response.body)["data"];
+   
+    return data;
     //return 0;
   }
 }

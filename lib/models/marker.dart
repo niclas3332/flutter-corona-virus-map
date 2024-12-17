@@ -11,11 +11,11 @@ class Marker {
   final int recovered;
 
   Marker(
-      {@required this.id,
-      @required this.country,
-      @required this.lastUpdate,
-      @required this.position,
-      @required this.confirmed,
-      @required this.deaths,
-      @required this.recovered});
+      {required this.id,
+      required this.country,
+      required this.lastUpdate,
+      required this.position,
+      required this.confirmed,
+      required this.deaths,
+      required this.recovered});
 }

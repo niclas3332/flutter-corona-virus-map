@@ -1,13 +1,9 @@
 import 'dart:io';
-
-import 'package:coronamaps/providers/has-premium.dart';
-import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
 class CityOverlayWidget {
-  OverlayEntry overlayEntry;
+  late OverlayEntry overlayEntry;
   void insertOverlayCity(
       BuildContext context,
       int recovereds,
@@ -15,10 +11,8 @@ class CityOverlayWidget {
       int death,
       String province,
       int lastUpdate,
-      int key,
-      FirebaseAnalytics analytics) {
-    analytics
-        .logEvent(name: "clickCountry", parameters: {"province": province});
+      int key) {
+ 
 
     try {
       overlayEntry.remove();
@@ -28,12 +22,10 @@ class CityOverlayWidget {
       final screen = MediaQuery.of(context).size;
       print(screen.height);
       bool isX = (screen.height >= 896.0) && Platform.isIOS;
-      bool isPremium =
-          Provider.of<HasPremium>(context, listen: false).hasPremium;
 
       return Padding(
         padding: EdgeInsets.only(
-            top: screen.height - 150 - (isPremium ? (isX ?  25 : 0) : (isX ? 75 : 50)),
+            top: screen.height - 150 - ( (isX ?  25 : 0)),
             left: 20,
             right: 20),
         child: Column(
@@ -43,10 +35,7 @@ class CityOverlayWidget {
             Dismissible(
               onDismissed: (direction) {
                 overlayEntry.remove();
-                analytics.logEvent(name: "dismissCountry", parameters: {
-                  "province": province,
-                  "direction": direction.toString()
-                });
+               
               },
               key: Key(key.toString()),
               child: Card(

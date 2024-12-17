@@ -1,18 +1,12 @@
-import 'dart:io';
 
-import 'package:admob_flutter/admob_flutter.dart';
-import 'package:coronamaps/keys.dart';
-import 'package:coronamaps/providers/has-premium.dart';
 import 'package:coronamaps/providers/map-provider.dart';
 import 'package:coronamaps/providers/world-provider.dart';
 import 'package:coronamaps/widgets/city-overlay-widget.dart';
-import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
-import 'package:unique_identifier/unique_identifier.dart';
+import 'package:intl/intl.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
-import 'package:url_launcher/url_launcher.dart';
 
 class MapScreen extends StatefulWidget {
   @override
@@ -20,18 +14,9 @@ class MapScreen extends StatefulWidget {
 }
 
 class _MapScreenState extends State<MapScreen> {
-  FirebaseAnalytics analytics = FirebaseAnalytics();
+  //FirebaseAnalytics analytics = //FirebaseAnalytics();
 
-  Future<void> initUniqueIdentifierState() async {
-    String identifier;
-    try {
-      identifier = await UniqueIdentifier.serial;
 
-      analytics.setUserId(identifier);
-    } catch (err) {
-      identifier = 'Failed to get Unique Identifier';
-    }
-  }
 
   bool _isError = false;
   bool _isLoading = true;
@@ -51,13 +36,15 @@ class _MapScreenState extends State<MapScreen> {
       setState(() {
         _isLoading = false;
       });
-    }).catchError((_) {
-      analytics.logEvent(name: "catchError_mapProvider");
+    }).catchError((err) {
+      //analytics.logEvent(name: "catchError_mapProvider");
 
       setState(() {
         _isLoading = false;
         _isError = true;
         print("Error true");
+        print(err.toString());
+    
       });
     });
   }
@@ -67,10 +54,11 @@ class _MapScreenState extends State<MapScreen> {
 
     Provider.of<WorldProvider>(context, listen: false)
         .fetchData()
-        .catchError((_) {
-      analytics.logEvent(name: "catchError_worldProvider");
+        .catchError((err) {
+      //analytics.logEvent(name: "catchError_worldProvider");
 
       print("Error");
+  
     }).then((_) {
       setState(() {});
     });
@@ -80,13 +68,11 @@ class _MapScreenState extends State<MapScreen> {
   void initState() {
     _fetchMap();
 
-    Provider.of<HasPremium>(context, listen: false).checkPremium();
 
     super.initState();
-    initUniqueIdentifierState();
+  
 
-    analytics.setCurrentScreen(
-        screenName: "/screens/mapScreen"); // why logging this
+
   }
 
   int key = 0;
@@ -116,24 +102,23 @@ class _MapScreenState extends State<MapScreen> {
           visible: f.visible,
           zIndex: f.zIndex,
           onTap: () {
-            print("Optapped " + _circleData[f.circleId].country);
+            print("Optapped " + _circleData[f.circleId]!.country);
             widget.insertOverlayCity(
                 context,
-                _circleData[f.circleId].recovered,
-                _circleData[f.circleId].confirmed,
-                _circleData[f.circleId].deaths,
-                _circleData[f.circleId].country,
-                _circleData[f.circleId].lastUpdate,
-                key,
-                analytics);
+                _circleData[f.circleId]!.recovered,
+                _circleData[f.circleId]!.confirmed,
+                _circleData[f.circleId]!.deaths,
+                _circleData[f.circleId]!.country,
+                _circleData[f.circleId]!.lastUpdate,
+                key);
           });
     });
 
     var worldData = Provider.of<WorldProvider>(context);
 
-    if (_isLoading) return Center(child: CircularProgressIndicator());
+    if (_isLoading){ return Center(child: CircularProgressIndicator());}
 
-    if (_isError)
+    if (_isError){
       return RefreshIndicator(
         onRefresh: () => _fetchMap(),
         child: ListView(
@@ -155,21 +140,13 @@ class _MapScreenState extends State<MapScreen> {
                       ),
                       ButtonBar(
                         children: <Widget>[
-                          FlatButton(
+                          TextButton(
                             child: const Text('TRY AGAIN'),
                             onPressed: () {
                               _fetchMap();
                             },
                           ),
-                          FlatButton(
-                            child: const Text('CONTACT US'),
-                            onPressed: () {
-                              analytics.logEvent(name: "pressed_contactUs");
-
-                              launch(
-                                  ("mailto:apps@niclas.xyz?subject=Corona%20Map%20App:%20Fetch%20Map%20no%20connection"));
-                            },
-                          ),
+                         
                         ],
                       ),
                     ],
@@ -179,11 +156,11 @@ class _MapScreenState extends State<MapScreen> {
             ),
           ],
         ),
-      );
+      );}
 
     final screen = MediaQuery.of(context).size;
+final formatter = NumberFormat();
 
-    bool isX = (screen.height >= 896.0) && Platform.isIOS;
 
     return Container(
       color: Colors.green,
@@ -204,7 +181,7 @@ class _MapScreenState extends State<MapScreen> {
                           color: Colors.white, fontWeight: FontWeight.bold),
                     ),
                     Text(
-                      worldData.confirmed.toString(),
+                      formatter.format(worldData.confirmed),
                       style: TextStyle(color: Colors.white),
                     ),
                   ],
@@ -217,24 +194,12 @@ class _MapScreenState extends State<MapScreen> {
                           color: Colors.white, fontWeight: FontWeight.bold),
                     ),
                     Text(
-                      worldData.deaths.toString(),
+                      formatter.format(worldData.deaths),
                       style: TextStyle(color: Colors.white),
                     ),
                   ],
                 ),
-                Column(
-                  children: <Widget>[
-                    Text(
-                      "RECOVERED",
-                      style: TextStyle(
-                          color: Colors.white, fontWeight: FontWeight.bold),
-                    ),
-                    Text(
-                      worldData.recovered.toString(),
-                      style: TextStyle(color: Colors.white),
-                    ),
-                  ],
-                ),
+            
               ],
             ),
           ),
@@ -249,22 +214,11 @@ class _MapScreenState extends State<MapScreen> {
               ),
             ),
           ),
-          Consumer<HasPremium>(builder: (BuildContext ctx, consumer, _) {
-            if (!consumer.hasPremium)
-              return Column(
-                children: <Widget>[
-                  AdmobBanner(
-                    adUnitId: Platform.isIOS ? Keys.adUnitIdiOS : Keys.adUnitId,
-                    adSize: AdmobBannerSize.FULL_BANNER,
-                  ),
-                  isX ? SizedBox(height: 25) : Container()
-                ],
-              );
-            else
-              return Container();
-          }),
+      
         ],
       ),
     );
+
+ 
   }
 }

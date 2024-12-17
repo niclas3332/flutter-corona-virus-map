@@ -14,7 +14,7 @@ description: Shows corona virus on a map
 version: 3.0.6+16
 
 environment:
-  sdk: ">=2.3.0 <3.0.0"
+  sdk: ">=2.12.0 <3.6.2"
 
 dependencies:
   flutter:
@@ -22,18 +22,13 @@ dependencies:
    
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
-  cupertino_icons: ^0.1.2
-  google_maps_flutter: ^0.5.22
-  http: ^0.12.0+4
-  timeago: ^2.0.26
-  firebase_core: ^0.4.4
-  firebase_analytics: ^5.0.2
-  provider: ^4.0.4
-  url_launcher: ^5.4.2
-  admob_flutter: ^0.3.4
-  flutter_inapp_purchase: ^2.1.2
-  flutter_native_admob: ^1.0.0
-  unique_identifier: ^0.0.3
+  cupertino_icons: ^1.0.6
+  google_maps_flutter: ^2.10.0
+  http: ^0.13.6
+  timeago: ^3.7.0
+  provider: ^6.1.2
+  url_launcher: ^6.1.11
+  intl: ^0.18.1
 
 
 
